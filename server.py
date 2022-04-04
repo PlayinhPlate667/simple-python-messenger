@@ -1,28 +1,45 @@
-# v 1.0.0
+# v 1.1.0
+import asyncio
 import socket
+import utils as u
 
-# create server socket
-server = socket.socket(
-    socket.AF_INET, # IPv4 
-    socket.SOCK_STREAM # TCP
-)
-IP = "127.0.0.1" # localhost
-PORT = 8080 # port for connection (use 1025-65000 ports for best working)
-
-server.bind((IP, PORT)) # bind server on address
-server.listen(5) # server listening connections (5 - len of queue on connect, not use 1-25 for best working)
-
-# main infinity cycle 
-while True:
-    usrSock, usrAddr = server.accept() # accept connections
-    print(f"connection, IP:{usrAddr[0]} PORT:{usrAddr[1]}")
+class Server:
+    def __init__(self) -> None:
+        self.connected = {}
     
-    # infinity cycle for listening connected user
-    while True:
-        data = usrSock.recv(1024).decode("UTF-8") # receive sended data, 1024 - size of package
-        print(f"user send : {data}")
+    async def listen(self, sessionID):
+        usrSock = self.connected[sessionID]["socket"]
+        u.info(f"listening {sessionID}")
+        while True:
+            try:
+                data = await self.taskLoop.sock_recv(usrSock, 1024)
+                data = data.decode("UTF-8")
+                u.log(f"{sessionID} send: {data}")
+                usrSock.send("data received".encode("UTF-8"))
+            except (ConnectionAbortedError, ConnectionResetError):
+                u.info(f"{sessionID} disconnected, close session")
+                del self.connected[sessionID]
+                return None
 
-        if data == "close": # if user send 'close' message
-            print("user break connection")
-            usrSock.close() # close connection
-            break # end of listening user
+    async def accept(self):
+        while True:
+            usrSock, usrAddr = await self.taskLoop.sock_accept(self.serverSocket)
+            sessionID = u.generate_ID(16)
+            u.info(f"user connected, session ID : {sessionID}")
+            self.connected[sessionID] = {
+                "socket" : usrSock,
+                "address" : usrAddr
+            }
+            self.taskLoop.create_task(self.listen(sessionID))
+
+    def start(self, IP, PORT, queueLen, addrFamily=socket.AF_INET, proto=socket.SOCK_STREAM):
+        self.serverSocket = socket.socket(addrFamily, proto)
+        self.serverSocket.bind((IP, PORT))
+        self.serverSocket.listen(queueLen)
+        self.taskLoop = asyncio.new_event_loop()
+        u.info(f"server started on addr <{IP}|{PORT}>")
+        self.taskLoop.run_until_complete(self.accept())
+
+if __name__ == "__main__":
+    serv = Server()
+    serv.start("127.0.0.1", 8080, 3)

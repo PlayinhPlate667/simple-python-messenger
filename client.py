@@ -1,6 +1,8 @@
 # v 1.0.0
 import socket
 
+
+
 # client socket
 client = socket.socket(
     socket.AF_INET, # IPv4
@@ -18,7 +20,7 @@ client.connect((IP, PORT))
 while True:
     data = input("$:") # input message
     client.send(data.encode("UTF-8")) # set encoding of server
-    print("sended sucsess!")
+    print(client.recv(1024).decode("UTF-8"))
 
     if data == "close": # if user input 'close'
         print("close of connection")
