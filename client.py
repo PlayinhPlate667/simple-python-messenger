@@ -19,6 +19,7 @@ client.connect((IP, PORT))
 # main infinity cycle
 while True:
     data = input("$:") # input message
+    if data=="":data="~<|EMPTY MESSAGE|>~"
     client.send(data.encode("UTF-8")) # set encoding of server
     print(client.recv(1024).decode("UTF-8"))
 
