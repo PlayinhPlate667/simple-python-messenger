@@ -1,29 +1,48 @@
-# v 1.0.0
+# v 1.1.0
+import asyncio
 import socket
+import os, sys
 
+class Client:
+    def __init__(self, messagesBUfferSize=256, addrFamily=socket.AF_INET, proto=socket.SOCK_STREAM) -> None:
+        self.clientSocket = socket.socket(
+            addrFamily, proto
+        )
+        self.messages = ""
+        self.msgBuffSize = messagesBUfferSize
+    
+    def connect(self, IP, PORT) -> bool:
+        try:
+            self.clientSocket.connect((IP, PORT))
+            return True
+        except ConnectionRefusedError:
+            return False
 
+    def main(self):
+        self.taskLoop = asyncio.new_event_loop()
+        self.taskLoop.create_task(self.send_data())
+        self.taskLoop.run_until_complete(self.listen_server())
 
-# client socket
-client = socket.socket(
-    socket.AF_INET, # IPv4
-    socket.SOCK_STREAM # TCP
-)
+    async def listen_server(self):
+        while True:
+            data = await self.taskLoop.sock_recv(self.clientSocket, 1024)
+            data = data.decode("UTF-8")
+            self.messages += data + "\n"
+            
+            # clear console
+            if sys.platform == 'win32': os.system("cls")
+            else: os.system("clear")
 
-# set IP and PORT of server
-IP = "127.0.0.1"
-PORT = 8080
+            print(self.messages)
+            # clear messages history if this needed
+            if len(self.messages) > self.msgBuffSize: self.messages = ""
 
-# connection to server
-client.connect((IP, PORT))
+    async def send_data(self):
+        while True:
+            data = await self.taskLoop.run_in_executor(None, input, "input~$: ")
+            self.clientSocket.send(data.encode("UTF-8"))
 
-# main infinity cycle
-while True:
-    data = input("$:") # input message
-    if data=="":data="~<|EMPTY MESSAGE|>~"
-    client.send(data.encode("UTF-8")) # set encoding of server
-    print(client.recv(1024).decode("UTF-8"))
-
-    if data == "close": # if user input 'close'
-        print("close of connection")
-        client.close() # close connection
-        break
+if __name__ == "__main__":
+    client = Client()
+    client.connect("127.0.0.1", 8080)
+    client.main()

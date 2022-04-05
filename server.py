@@ -36,7 +36,11 @@ class Server:
                     data = data.decode("UTF-8")
 
                     self.logger.log(f"{sessionID} send: {data}")
-                    usrSock.send("data received".encode("UTF-8"))
+                    for ID in self.connected.keys():
+                        usrSendSocket = self.connected[ID]["socket"]
+                        if isinstance(usrSendSocket, socket.socket):
+                            message = f"[{sessionID}]: {data}"
+                            usrSendSocket.send(message.encode("UTF-8"))
 
                 except (ConnectionAbortedError, ConnectionResetError):
                     self.logger.info(f"{sessionID} disconnected, close session")
@@ -53,7 +57,7 @@ class Server:
         # main server cycle
         while True:
             usrSock, usrAddr = await self.taskLoop.sock_accept(self.serverSocket)
-            sessionID = u.generate_ID(16)
+            sessionID = u.generate_ID(int(self.config.get("ID LEN")))
             self.logger.info(f"user connected, session ID : {sessionID}")
 
             self.add_user_to_list(sessionID, usrSock, usrAddr)
@@ -74,7 +78,7 @@ class Server:
         self.taskLoop.run_until_complete(self.accept())
     
     def __del__(self):
-        self.logger.info("server stopped")
+        self.logger.info("server object deleted")
         self.logger.dump("logs.txt")
 
 
