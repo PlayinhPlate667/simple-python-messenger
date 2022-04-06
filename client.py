@@ -1,4 +1,5 @@
-# v 1.1.0
+# v 1.3.0
+from utils.cryptor import Cryptor
 import asyncio
 import socket
 import os, sys
@@ -10,10 +11,15 @@ class Client:
         )
         self.messages = ""
         self.msgBuffSize = messagesBUfferSize
+        self.cryptor = Cryptor(1024)
     
     def connect(self, IP, PORT) -> bool:
         try:
             self.clientSocket.connect((IP, PORT))
+            print("SETUP SAFE CONNECTION")
+            self.clientSocket.send(self.cryptor.to_bytes(self.cryptor.get_public_key()))
+            self.cryptor.set_public_key(self.cryptor.to_obj(self.clientSocket.recv(1024)))
+            print("CONNECTION SETUPED")
             return True
         except ConnectionRefusedError:
             return False
@@ -25,8 +31,9 @@ class Client:
 
     async def listen_server(self):
         while True:
+            # receive data
             data = await self.taskLoop.sock_recv(self.clientSocket, 1024)
-            data = data.decode("UTF-8")
+            data = self.cryptor.to_obj(self.cryptor.decrypt(data))
             self.messages += data + "\n"
             
             # clear console
@@ -40,7 +47,7 @@ class Client:
     async def send_data(self):
         while True:
             data = await self.taskLoop.run_in_executor(None, input, "input~$: ")
-            self.clientSocket.send(data.encode("UTF-8"))
+            self.clientSocket.send(self.cryptor.encrypt(self.cryptor.to_bytes(data)))
 
 if __name__ == "__main__":
     client = Client()

@@ -1,4 +1,3 @@
-from colorama import Fore
 import datetime
 import random
 import os

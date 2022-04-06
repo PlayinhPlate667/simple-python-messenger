@@ -1,4 +1,4 @@
-import utils
+from utils import utils
 import colorama
 colorama.init(autoreset=False)
 
