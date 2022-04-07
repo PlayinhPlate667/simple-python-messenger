@@ -1,0 +1,20 @@
+[2022-04-07 22:39:53.371974 | INFO]: server started on addr <127.0.0.1|8080> with queue len: 3
+[2022-04-07 22:40:08.212262 | INFO]: user connected, session ID : 5wCKKvcU
+[2022-04-07 22:40:08.212262 | INFO]: try setup connection with ID : 5wCKKvcU
+[2022-04-07 22:40:09.965456 | INFO]: safe-channel setuped, listening 5wCKKvcU
+[2022-04-07 22:40:27.182270 | LOG]: ID:5wCKKvcU send message 'req'
+[2022-04-07 22:40:29.056517 | LOG]: ID:5wCKKvcU send message 'asdasd'
+[2022-04-07 22:40:30.244892 | LOG]: ID:5wCKKvcU send message 'dds'
+[2022-04-07 22:40:31.116469 | LOG]: ID:5wCKKvcU send message 'sd'
+[2022-04-07 22:40:31.965346 | LOG]: ID:5wCKKvcU send message 'sd'
+[2022-04-07 22:40:33.269311 | LOG]: ID:5wCKKvcU send message 'dsds'
+[2022-04-07 22:40:57.179031 | INFO]: user connected, session ID : UZta7rC5
+[2022-04-07 22:40:57.181029 | INFO]: try setup connection with ID : UZta7rC5
+[2022-04-07 22:40:59.349135 | INFO]: safe-channel setuped, listening UZta7rC5
+[2022-04-07 22:41:08.529832 | WARNING]: entered bad-struct cmd '/reg': /reg asdasd
+[2022-04-07 22:41:27.319960 | LOG]: ID:UZta7rC5 send message 'asd'
+[2022-04-07 22:41:33.237904 | LOG]: ID:5wCKKvcU send message 'reerere'
+[2022-04-07 22:41:47.782358 | LOG]: ID:5wCKKvcU send message 'asd'
+[2022-04-07 22:42:04.720466 | WARNING]: user asdasd2, 5wCKKvcU trying send private message to user asdasd, but user offline
+[2022-04-07 22:42:25.774520 | LOG]: ID:UZta7rC5 send message 'ds'
+[2022-04-07 22:44:53.385992 | INFO]: save logs

@@ -1,4 +1,4 @@
-# v 1.3.0
+# v 1.3.0 - latest
 from utils.cryptor import Cryptor
 import asyncio
 import socket
@@ -11,7 +11,7 @@ class Client:
         )
         self.messages = ""
         self.msgBuffSize = messagesBUfferSize
-        self.cryptor = Cryptor(1024)
+        self.cryptor = Cryptor(2048)
     
     def connect(self, IP, PORT) -> bool:
         try:
@@ -19,7 +19,7 @@ class Client:
             print("SETUP SAFE CONNECTION")
             self.clientSocket.send(self.cryptor.to_bytes(self.cryptor.get_public_key()))
             self.cryptor.set_public_key(self.cryptor.to_obj(self.clientSocket.recv(1024)))
-            print("CONNECTION SETUPED")
+            print("CONNECTION SUCSESS")
             return True
         except ConnectionRefusedError:
             return False
